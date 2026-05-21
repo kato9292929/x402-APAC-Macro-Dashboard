@@ -15,6 +15,7 @@ import type { RouteConfig } from "x402-next";
  */
 
 export const SOLANA_USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+export const BASE_USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 export const USDT_BNB =
   process.env.NEXT_PUBLIC_USDT_BNB_CONTRACT ??
   "0x55d398326f99059fF775485246999027B3197955";
