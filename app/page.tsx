@@ -1,4 +1,5 @@
 import { getSnapshot } from "@/lib/macro";
+import { Providers } from "./providers";
 import { WalletButton } from "@/components/WalletButton";
 import { PaymentSelector } from "@/components/PaymentSelector";
 import type { PanelData, Regime } from "@/lib/types";
@@ -132,6 +133,7 @@ export default async function HomePage() {
   const updatedLabel = `${updated.toISOString().slice(0, 16).replace("T", " ")} UTC`;
 
   return (
+    <Providers>
     <div className="page">
       <header className="site-header">
         <div>
@@ -249,8 +251,9 @@ export default async function HomePage() {
 
       <footer className="site-footer">
         <span>x402 APAC Macro Intelligence Dashboard</span>
-        <span>Settled on Base · Powered by Claude</span>
+        <span>Multi-chain x402 · Powered by Claude</span>
       </footer>
     </div>
+    </Providers>
   );
 }

@@ -1,7 +1,7 @@
 import { panelHandler } from "@/lib/macroHandlers";
 import {
   USDT_BNB,
-  PRICE_ATOMIC_6,
+  PRICE_ATOMIC_18,
   ENDPOINT_DESCRIPTION,
   withManual402,
   corsPreflight,
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const POST = withManual402(panelHandler, {
   network: "eip155:56",
   asset: USDT_BNB,
-  amount: PRICE_ATOMIC_6.panel,
+  amount: PRICE_ATOMIC_18.panel,
   description: ENDPOINT_DESCRIPTION.panel,
   payTo: process.env.WALLET_ADDRESS ?? "",
 });

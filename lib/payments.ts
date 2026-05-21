@@ -22,6 +22,14 @@ export const JPYC_POLYGON =
   process.env.NEXT_PUBLIC_JPYC_CONTRACT ??
   "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB";
 
+/**
+ * JPYC EIP-712 domain for the x402 "exact" EVM scheme. Verify these against
+ * the deployed JPYC contract — and confirm it supports EIP-3009
+ * (transferWithAuthorization) — before enabling real JPYC settlement.
+ */
+export const JPYC_EIP712_NAME = process.env.JPYC_EIP712_NAME ?? "JPYC";
+export const JPYC_EIP712_VERSION = process.env.JPYC_EIP712_VERSION ?? "1";
+
 export type EndpointKey = "dashboard" | "panel" | "weekly";
 
 /** USD price per endpoint — used by the Polygon withX402 USDC routes. */
@@ -31,11 +39,21 @@ export const PRICE_USD: Record<EndpointKey, string> = {
   weekly: "$3.00",
 };
 
-/** Atomic amount for 6-decimal stablecoins (USDC / USDT manual-402 envelopes). */
+/** Atomic amount for 6-decimal stablecoins (Solana USDC manual-402 envelopes). */
 export const PRICE_ATOMIC_6: Record<EndpointKey, string> = {
   dashboard: "300000",
   panel: "200000",
   weekly: "3000000",
+};
+
+/**
+ * Atomic amount for 18-decimal tokens — BNB Chain USDT (`0x55d3...7955`) has
+ * 18 decimals, so the manual-402 envelope cannot reuse the 6-decimal values.
+ */
+export const PRICE_ATOMIC_18: Record<EndpointKey, string> = {
+  dashboard: "300000000000000000",
+  panel: "200000000000000000",
+  weekly: "3000000000000000000",
 };
 
 /**
@@ -60,6 +78,15 @@ export function jpycAtomic(endpoint: EndpointKey): string {
 }
 
 export const facilitatorUrl = (process.env.FACILITATOR_URL ??
+  "https://api.developer.coinbase.com/rpc/v1/base/facilitator") as `${string}://${string}`;
+
+/**
+ * Polygon settlement needs a Polygon-capable facilitator. Falls back to
+ * FACILITATOR_URL, but the Base CDP facilitator does not settle Polygon —
+ * set POLYGON_FACILITATOR_URL to a Polygon-capable facilitator in production.
+ */
+export const polygonFacilitatorUrl = (process.env.POLYGON_FACILITATOR_URL ??
+  process.env.FACILITATOR_URL ??
   "https://api.developer.coinbase.com/rpc/v1/base/facilitator") as `${string}://${string}`;
 
 const CORS_HEADERS: Record<string, string> = {
@@ -147,7 +174,7 @@ export function polygonRouteConfig(
           asset: {
             address: JPYC_POLYGON as `0x${string}`,
             decimals: 18,
-            eip712: { name: "JPYC", version: "1" },
+            eip712: { name: JPYC_EIP712_NAME, version: JPYC_EIP712_VERSION },
           },
         },
         network: "polygon",

@@ -1,7 +1,7 @@
 import { dashboardHandler } from "@/lib/macroHandlers";
 import {
   USDT_BNB,
-  PRICE_ATOMIC_6,
+  PRICE_ATOMIC_18,
   ENDPOINT_DESCRIPTION,
   withManual402,
   corsPreflight,
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const GET = withManual402(dashboardHandler, {
   network: "eip155:56",
   asset: USDT_BNB,
-  amount: PRICE_ATOMIC_6.dashboard,
+  amount: PRICE_ATOMIC_18.dashboard,
   description: ENDPOINT_DESCRIPTION.dashboard,
   payTo: process.env.WALLET_ADDRESS ?? "",
 });

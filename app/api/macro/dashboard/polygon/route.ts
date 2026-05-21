@@ -1,6 +1,6 @@
 import { withX402 } from "x402-next";
 import { dashboardHandler } from "@/lib/macroHandlers";
-import { polygonRouteConfig, facilitatorUrl, corsPreflight } from "@/lib/payments";
+import { polygonRouteConfig, polygonFacilitatorUrl, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const GET = withX402(
   dashboardHandler,
   payTo,
   polygonRouteConfig("dashboard"),
-  { url: facilitatorUrl },
+  { url: polygonFacilitatorUrl },
 );
 
 export function OPTIONS() {

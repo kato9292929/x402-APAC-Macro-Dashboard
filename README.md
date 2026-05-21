@@ -126,6 +126,7 @@ SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
 
 # x402 facilitator
 FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
+POLYGON_FACILITATOR_URL=         # Polygon-capable facilitator (falls back to FACILITATOR_URL)
 
 # RPC endpoints
 HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
@@ -136,6 +137,8 @@ BNB_RPC_URL=https://bsc-dataseed.binance.org/
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
 NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
 NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
+JPYC_EIP712_NAME=JPYC            # verify against the deployed JPYC contract
+JPYC_EIP712_VERSION=1            # verify against the deployed JPYC contract
 ```
 
 Without keys the dashboard runs on the fallback dataset. Copy `.env.example` to
@@ -259,6 +262,7 @@ SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
 
 # x402 facilitator
 FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
+POLYGON_FACILITATOR_URL=         # Polygon-capable facilitator (falls back to FACILITATOR_URL)
 
 # RPC endpoints
 HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
@@ -269,6 +273,8 @@ BNB_RPC_URL=https://bsc-dataseed.binance.org/
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
 NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
 NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
+JPYC_EIP712_NAME=JPYC            # verify against the deployed JPYC contract
+JPYC_EIP712_VERSION=1            # verify against the deployed JPYC contract
 ```
 
 APIキーが未設定の場合はフォールバックデータで動作します。`.env.example` を

@@ -1,6 +1,6 @@
 import { withX402 } from "x402-next";
 import { panelHandler } from "@/lib/macroHandlers";
-import { polygonRouteConfig, facilitatorUrl, corsPreflight } from "@/lib/payments";
+import { polygonRouteConfig, polygonFacilitatorUrl, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const POST = withX402(
   panelHandler,
   payTo,
   polygonRouteConfig("panel"),
-  { url: facilitatorUrl },
+  { url: polygonFacilitatorUrl },
 );
 
 export function OPTIONS() {

@@ -1,7 +1,7 @@
 import { weeklyHandler } from "@/lib/macroHandlers";
 import {
   USDT_BNB,
-  PRICE_ATOMIC_6,
+  PRICE_ATOMIC_18,
   ENDPOINT_DESCRIPTION,
   withManual402,
   corsPreflight,
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const GET = withManual402(weeklyHandler, {
   network: "eip155:56",
   asset: USDT_BNB,
-  amount: PRICE_ATOMIC_6.weekly,
+  amount: PRICE_ATOMIC_18.weekly,
   description: ENDPOINT_DESCRIPTION.weekly,
   payTo: process.env.WALLET_ADDRESS ?? "",
 });
