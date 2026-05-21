@@ -1,0 +1,477 @@
+:root {
+  --bg: #0a0a0a;
+  --gold: #c8a96e;
+  --gold-dim: #8a7650;
+  --panel: #141414;
+  --panel-2: #181715;
+  --border: #2a2722;
+  --border-gold: rgba(200, 169, 110, 0.28);
+  --text: #ece8e1;
+  --text-dim: #8d8a83;
+  --pos: #5fb878;
+  --neg: #d9534f;
+  --neutral: #c8a96e;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.brand-mark {
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.brand-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 56px 0 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
+
+.hero h1 .accent {
+  color: var(--gold);
+}
+
+.hero p {
+  margin-top: 18px;
+  max-width: 640px;
+  color: var(--text-dim);
+  font-size: 16px;
+}
+
+.hero-meta {
+  margin-top: 26px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--border-gold);
+  border-radius: 2px;
+  padding: 6px 12px;
+}
+
+.tag.muted {
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+/* ---------- Section ---------- */
+.section {
+  margin-top: 56px;
+}
+
+.section-label {
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 18px;
+}
+
+/* ---------- Overall score card ---------- */
+.overall-card {
+  background: linear-gradient(160deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border-gold);
+  border-radius: 4px;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 36px;
+}
+
+.overall-score {
+  text-align: center;
+  border-right: 1px solid var(--border);
+  padding-right: 24px;
+}
+
+.overall-score .value {
+  font-size: 76px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.overall-score .scale {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+.regime-badge {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding: 8px 16px;
+  border-radius: 2px;
+}
+
+.regime-RISK_ON {
+  background: rgba(95, 184, 120, 0.12);
+  color: var(--pos);
+  border: 1px solid rgba(95, 184, 120, 0.4);
+}
+
+.regime-RISK_NEUTRAL {
+  background: rgba(200, 169, 110, 0.12);
+  color: var(--gold);
+  border: 1px solid var(--border-gold);
+}
+
+.regime-RISK_OFF {
+  background: rgba(217, 83, 79, 0.12);
+  color: var(--neg);
+  border: 1px solid rgba(217, 83, 79, 0.4);
+}
+
+.overall-detail h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.overall-detail .onchain {
+  margin-top: 14px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.overall-detail .onchain strong {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.overall-bar-wrap {
+  margin-top: 22px;
+}
+
+/* ---------- Score bar ---------- */
+.score-bar {
+  position: relative;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.score-bar .zero {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 1px;
+  height: 12px;
+  background: var(--gold-dim);
+}
+
+.score-bar .marker {
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  border: 2px solid var(--bg);
+}
+
+.score-bar-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Panel grid ---------- */
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.panel-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-card:hover {
+  border-color: var(--border-gold);
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.panel-title-ja {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.panel-title-en {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-top: 2px;
+}
+
+.panel-trend {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.trend-arrow {
+  font-size: 13px;
+}
+
+.panel-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.panel-score {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.panel-keymetric {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.panel-bar {
+  margin-top: 14px;
+}
+
+.metric-list {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 13px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.metric-chip {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 42px;
+  text-align: center;
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+.datapoints {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+}
+
+.datapoint {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  border-bottom: 1px dotted var(--border);
+  padding-bottom: 4px;
+}
+
+.datapoint .dp-label {
+  color: var(--text-dim);
+}
+
+.datapoint .dp-value {
+  font-weight: 500;
+}
+
+.panel-foot {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sources {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.detail-cta {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid var(--border-gold);
+  border-radius: 2px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+/* ---------- Pricing ---------- */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.price-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+}
+
+.price-card .price-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.price-card .price-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 12px 0 4px;
+}
+
+.price-card .price-endpoint {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.price-card .price-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 12px;
+}
+
+/* ---------- Disclaimer / footer ---------- */
+.disclaimer {
+  margin-top: 56px;
+  padding: 18px 22px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold-dim);
+  border-radius: 3px;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: var(--panel);
+}
+
+.site-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .overall-card {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .overall-score {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-right: 0;
+    padding-bottom: 20px;
+  }
+  .panel-grid,
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
