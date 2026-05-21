@@ -1,5 +1,6 @@
 import { getSnapshot } from "@/lib/macro";
 import { WalletButton } from "@/components/WalletButton";
+import { PaymentSelector } from "@/components/PaymentSelector";
 import type { PanelData, Regime } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -231,6 +232,15 @@ export default async function HomePage() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="section">
+        <div className="section-label">Payment Methods — Multi-chain</div>
+        <p className="pay-intro">
+          決済はSolana・Base・Polygon・BNB Chainに対応。デフォルトはSolana（USDC）です。
+          チェーンを選択すると、対応トークンと決済エンドポイントが切り替わります。
+        </p>
+        <PaymentSelector />
       </section>
 
       <div className="disclaimer">

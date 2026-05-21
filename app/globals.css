@@ -471,7 +471,173 @@ a {
     padding-bottom: 20px;
   }
   .panel-grid,
-  .pricing-grid {
+  .pricing-grid,
+  .pay-grid {
     grid-template-columns: 1fr;
   }
+  .chain-tabs,
+  .token-tabs {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Payment selector ---------- */
+.pay-intro {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 18px;
+  max-width: 660px;
+}
+
+.pay-selector {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.chain-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.chain-tab {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.chain-tab:hover {
+  color: var(--text);
+}
+
+.chain-tab.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.08);
+}
+
+.token-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.token-tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 7px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.token-tab.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.08);
+}
+
+.token-tab.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.pay-banner {
+  margin-top: 14px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.08);
+  border: 1px solid var(--border-gold);
+  border-radius: 3px;
+}
+
+.pay-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.pay-info {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pay-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.pi-label {
+  color: var(--text-dim);
+}
+
+.pi-value {
+  text-align: right;
+  word-break: break-all;
+}
+
+.pay-endpoints {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pay-endpoint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.ep-method {
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 38px;
+}
+
+.ep-path {
+  flex: 1;
+  color: var(--text-dim);
+  word-break: break-all;
+}
+
+.ep-price {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pay-connect {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
 }

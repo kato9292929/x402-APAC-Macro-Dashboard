@@ -8,13 +8,13 @@ import {
   darkTheme,
 } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { base } from "wagmi/chains";
+import { base, polygon, bsc } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const wagmiConfig = getDefaultConfig({
   appName: "x402 APAC Macro Dashboard",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "placeholder",
-  chains: [base],
+  chains: [base, polygon, bsc],
   ssr: true,
 });
 

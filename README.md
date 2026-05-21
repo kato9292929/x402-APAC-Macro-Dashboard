@@ -49,8 +49,8 @@ dataset, so the UI and the API stay coherent even without configured keys.
 | `/api/macro/panel` | POST | **$0.20** | Detail for one panel — body `{ "panel": "rates" \| "fx" \| "realestate" \| "inflation" }` |
 | `/api/macro/weekly` | GET | **$3.00** | Weekly APAC macro intelligence report (~3,000 chars) |
 
-Payments are settled on **Base** via the configured x402 facilitator. Requests
-without a valid payment receive HTTP 402.
+Payments settle on **Base, Solana, Polygon or BNB Chain** — see *Multi-chain
+payments* below. Requests without a valid payment receive HTTP 402.
 
 #### `/api/macro/dashboard` response
 
@@ -76,21 +76,66 @@ without a valid payment receive HTTP 402.
 }
 ```
 
+### Multi-chain payments
+
+Payments are accepted on four chains. The original endpoints stay **Base / USDC**;
+each additional chain is a sub-route — existing `route.ts` files are unchanged.
+
+| Chain | Token(s) | Route | Gating |
+| --- | --- | --- | --- |
+| **Base** | USDC | `/api/macro/{endpoint}` | `paymentMiddleware` |
+| **Solana** | USDC | `/api/macro/{endpoint}/solana` | manual x402 402 |
+| **Polygon** | USDC · JPYC | `/api/macro/{endpoint}/polygon` | `withX402` (`network: "polygon"`) |
+| **BNB Chain** | USDT | `/api/macro/{endpoint}/bnb` | manual x402 402 |
+
+- The chain selector on the landing page defaults to **Solana**.
+- **Solana** → USDC only (the JPYC tab is shown disabled / grayed out).
+- **BNB Chain** → USDT only.
+- On **Polygon**, request JPYC pricing by adding `?token=jpyc` to the sub-route.
+- BNB Chain uses a manual 402 (`network: "eip155:56"`): the x402 `Network` enum
+  has no `bnb`/`bsc` value, so `withX402` cannot be used for it.
+
+Token contracts:
+
+| Token | Chain | Contract |
+| --- | --- | --- |
+| USDC | Solana | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+| JPYC | Polygon | `0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB` |
+| USDT | BNB Chain | `0x55d398326f99059fF775485246999027B3197955` |
+
+Wallet connection uses RainbowKit / wagmi for the EVM chains and the Solana
+wallet adapter (Phantom · Solflare) for Solana.
+
 ### Tech stack
 
 Next.js 15 · React 19 · `x402-next` · `@anthropic-ai/sdk` (Claude `claude-opus-4-7`) ·
-viem · wagmi · RainbowKit · TanStack Query.
+viem · wagmi · RainbowKit · TanStack Query · Solana wallet adapter.
 
 ### Environment variables
 
 ```
+# Data sources
 NANSEN_API_KEY=
 ANTHROPIC_API_KEY=
-WALLET_ADDRESS=
-FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
 ESTAT_API_KEY=
 JAPAN_DATA_API_URL=
+
+# Payment wallets
+WALLET_ADDRESS=                  # EVM receiving wallet (Base / Polygon / BNB)
+SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
+
+# x402 facilitator
+FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
+
+# RPC endpoints
+HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
+NEXT_PUBLIC_HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
+BNB_RPC_URL=https://bsc-dataseed.binance.org/
+
+# Wallet / token contracts
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
+NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
+NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
 ```
 
 Without keys the dashboard runs on the fallback dataset. Copy `.env.example` to
@@ -155,8 +200,8 @@ APACの4つのマクロ要因（金利・為替・不動産・インフレ）を
 | `/api/macro/panel` | POST | **$0.20** | 特定パネルの詳細 — ボディ `{ "panel": "rates" \| "fx" \| "realestate" \| "inflation" }` |
 | `/api/macro/weekly` | GET | **$3.00** | 週次APACマクロインテリジェンスレポート（約3,000字） |
 
-決済は設定済みの x402 facilitator 経由で **Base** 上で行われます。有効な支払いの
-ないリクエストには HTTP 402 が返されます。
+決済は **Base・Solana・Polygon・BNB Chain** に対応（詳細は「マルチチェーン決済」を
+参照）。有効な支払いのないリクエストには HTTP 402 が返されます。
 
 ### 価格
 
@@ -164,21 +209,66 @@ APACの4つのマクロ要因（金利・為替・不動産・インフレ）を
 - パネル詳細: **$0.20**
 - 週次レポート: **$3.00**
 
+### マルチチェーン決済
+
+決済は4つのチェーンに対応しています。既存エンドポイントは **Base / USDC** のまま、
+各チェーンはサブルートとして追加されます（既存の `route.ts` は変更しません）。
+
+| チェーン | トークン | ルート | ゲーティング |
+| --- | --- | --- | --- |
+| **Base** | USDC | `/api/macro/{endpoint}` | `paymentMiddleware` |
+| **Solana** | USDC | `/api/macro/{endpoint}/solana` | 手動 x402 402 |
+| **Polygon** | USDC・JPYC | `/api/macro/{endpoint}/polygon` | `withX402`（`network: "polygon"`） |
+| **BNB Chain** | USDT | `/api/macro/{endpoint}/bnb` | 手動 x402 402 |
+
+- ランディングページのチェーンセレクターはデフォルトで **Solana**。
+- **Solana** → USDCのみ（JPYCタブは無効・グレーアウト表示）。
+- **BNB Chain** → USDTのみ。
+- **Polygon** で JPYC 決済を行う場合はサブルートに `?token=jpyc` を付与。
+- BNB Chain は手動402（`network: "eip155:56"`）を使用します。x402の `Network`
+  列挙型に `bnb`/`bsc` がないため `withX402` は利用できません。
+
+トークンコントラクト:
+
+| トークン | チェーン | コントラクト |
+| --- | --- | --- |
+| USDC | Solana | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+| JPYC | Polygon | `0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB` |
+| USDT | BNB Chain | `0x55d398326f99059fF775485246999027B3197955` |
+
+ウォレット接続は EVM チェーンで RainbowKit / wagmi、Solana で Solana ウォレット
+アダプター（Phantom・Solflare）を使用します。
+
 ### 技術スタック
 
 Next.js 15 · React 19 · `x402-next` · `@anthropic-ai/sdk`（Claude `claude-opus-4-7`）·
-viem · wagmi · RainbowKit · TanStack Query。
+viem · wagmi · RainbowKit · TanStack Query · Solana ウォレットアダプター。
 
 ### 環境変数
 
 ```
+# Data sources
 NANSEN_API_KEY=
 ANTHROPIC_API_KEY=
-WALLET_ADDRESS=
-FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
 ESTAT_API_KEY=
 JAPAN_DATA_API_URL=
+
+# Payment wallets
+WALLET_ADDRESS=                  # EVM receiving wallet (Base / Polygon / BNB)
+SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
+
+# x402 facilitator
+FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
+
+# RPC endpoints
+HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
+NEXT_PUBLIC_HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
+BNB_RPC_URL=https://bsc-dataseed.binance.org/
+
+# Wallet / token contracts
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
+NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
+NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
 ```
 
 APIキーが未設定の場合はフォールバックデータで動作します。`.env.example` を
