@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["x402-next"],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -14,13 +13,6 @@ const nextConfig: NextConfig = {
       ...(config.resolve.alias ?? {}),
       "pino-pretty": false,
     };
-    // x402-next's facilitator SDK (axios / jose, via @coinbase/cdp-sdk) reports
-    // Node APIs the Edge runtime lacks. Those code paths are not exercised by
-    // the payment flow used here, so the warnings are silenced.
-    config.ignoreWarnings = [
-      ...(config.ignoreWarnings ?? []),
-      { module: /node_modules[\\/](jose|axios)[\\/]/ },
-    ];
     return config;
   },
 };

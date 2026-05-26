@@ -1,23 +1,28 @@
-import { NextResponse } from "next/server";
-import { getSnapshot } from "@/lib/macro";
-import { generateWeeklyReport } from "@/lib/claude";
+import { withX402 } from "@x402/next";
+import { weeklyHandler } from "@/lib/macroHandlers";
+import { x402Server, PAY_TO, BASE_NETWORK } from "@/lib/x402";
+import { PRICE_USD, ENDPOINT_DESCRIPTION, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
-/**
- * GET /api/macro/weekly — x402-gated ($3.00).
- * Returns the weekly APAC macro intelligence report (~3,000 characters).
- */
-export async function GET() {
-  const snapshot = await getSnapshot();
-  const report = await generateWeeklyReport(snapshot);
+// GET /api/macro/weekly — Base USDC ($3.00), x402 v2 withX402.
+export const GET = withX402(
+  weeklyHandler,
+  {
+    accepts: [
+      {
+        scheme: "exact",
+        payTo: PAY_TO,
+        price: PRICE_USD.weekly,
+        network: BASE_NETWORK,
+      },
+    ],
+    description: ENDPOINT_DESCRIPTION.weekly,
+    mimeType: "application/json",
+  },
+  x402Server,
+);
 
-  return NextResponse.json({
-    updatedAt: snapshot.updatedAt,
-    period: "weekly",
-    overallScore: snapshot.overallScore,
-    regime: snapshot.regime,
-    dataMode: snapshot.dataMode,
-    report,
-  });
+export function OPTIONS() {
+  return corsPreflight();
 }

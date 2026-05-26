@@ -1,23 +1,28 @@
-import { NextResponse } from "next/server";
-import { getSnapshot } from "@/lib/macro";
-import { analyzeDashboard } from "@/lib/claude";
+import { withX402 } from "@x402/next";
+import { dashboardHandler } from "@/lib/macroHandlers";
+import { x402Server, PAY_TO, BASE_NETWORK } from "@/lib/x402";
+import { PRICE_USD, ENDPOINT_DESCRIPTION, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
-/**
- * GET /api/macro/dashboard — x402-gated ($0.30).
- * Returns all four macro panels plus a Claude-generated overall analysis.
- */
-export async function GET() {
-  const snapshot = await getSnapshot();
-  const analysis = await analyzeDashboard(snapshot);
+// GET /api/macro/dashboard — Base USDC ($0.30), x402 v2 withX402.
+export const GET = withX402(
+  dashboardHandler,
+  {
+    accepts: [
+      {
+        scheme: "exact",
+        payTo: PAY_TO,
+        price: PRICE_USD.dashboard,
+        network: BASE_NETWORK,
+      },
+    ],
+    description: ENDPOINT_DESCRIPTION.dashboard,
+    mimeType: "application/json",
+  },
+  x402Server,
+);
 
-  return NextResponse.json({
-    updatedAt: snapshot.updatedAt,
-    overallScore: snapshot.overallScore,
-    regime: snapshot.regime,
-    dataMode: snapshot.dataMode,
-    panels: snapshot.panels,
-    analysis,
-  });
+export function OPTIONS() {
+  return corsPreflight();
 }

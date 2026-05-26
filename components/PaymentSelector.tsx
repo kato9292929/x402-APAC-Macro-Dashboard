@@ -27,30 +27,30 @@ const CHAINS: ChainInfo[] = [
   {
     id: "solana",
     label: "Solana",
-    network: "solana-mainnet",
+    network: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
     tokens: ["USDC"],
     disabledTokens: ["JPYC"],
     routeSuffix: "/solana",
-    settlement: "Manual x402 (HTTP 402)",
+    settlement: "Manual x402 v2 (HTTP 402)",
     banner: "SolanaネットワークではUSDC決済のみご利用いただけます",
   },
   {
     id: "base",
     label: "Base",
-    network: "base",
-    tokens: ["USDC", "JPYC"],
+    network: "eip155:8453",
+    tokens: ["USDC"],
     disabledTokens: [],
     routeSuffix: "",
-    settlement: "paymentMiddleware (x402-next)",
+    settlement: "withX402 (@x402/next v2)",
   },
   {
     id: "polygon",
     label: "Polygon",
-    network: "polygon",
-    tokens: ["USDC", "JPYC"],
+    network: "eip155:137",
+    tokens: ["USDC"],
     disabledTokens: [],
     routeSuffix: "/polygon",
-    settlement: "withX402 (x402-next)",
+    settlement: "withX402 (@x402/next v2)",
   },
   {
     id: "bnb",
@@ -59,14 +59,11 @@ const CHAINS: ChainInfo[] = [
     tokens: ["USDT"],
     disabledTokens: [],
     routeSuffix: "/bnb",
-    settlement: "Manual x402 (HTTP 402)",
+    settlement: "Manual x402 v2 (HTTP 402)",
     banner: "BNB ChainではUSDT決済のみご利用いただけます",
   },
 ];
 
-const JPYC =
-  process.env.NEXT_PUBLIC_JPYC_CONTRACT ??
-  "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB";
 const USDT_BNB =
   process.env.NEXT_PUBLIC_USDT_BNB_CONTRACT ??
   "0x55d398326f99059fF775485246999027B3197955";
@@ -74,9 +71,7 @@ const USDT_BNB =
 const ASSET: Record<string, string> = {
   "solana:USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   "base:USDC": "Native USDC (Base)",
-  "base:JPYC": JPYC,
   "polygon:USDC": "Native USDC (Polygon)",
-  "polygon:JPYC": JPYC,
   "bnb:USDT": USDT_BNB,
 };
 
@@ -99,8 +94,6 @@ export function PaymentSelector() {
 
   const allTokens = [...chain.tokens, ...chain.disabledTokens];
   const asset = ASSET[`${chainId}:${token}`] ?? "—";
-  const tokenQuery =
-    chainId === "polygon" && token === "JPYC" ? "?token=jpyc" : "";
 
   return (
     <div className="pay-selector">
@@ -146,7 +139,7 @@ export function PaymentSelector() {
         <div className="pay-info">
           <div className="pay-info-row">
             <span className="pi-label">ネットワーク</span>
-            <span className="pi-value">{chain.network}</span>
+            <span className="pi-value mono">{chain.network}</span>
           </div>
           <div className="pay-info-row">
             <span className="pi-label">トークン</span>
@@ -169,7 +162,6 @@ export function PaymentSelector() {
               <span className="ep-path mono">
                 /api/macro/{e.path}
                 {chain.routeSuffix}
-                {tokenQuery}
               </span>
               <span className="ep-price">{e.price}</span>
             </div>

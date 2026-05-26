@@ -76,31 +76,34 @@ payments* below. Requests without a valid payment receive HTTP 402.
 }
 ```
 
-### Multi-chain payments
+### Multi-chain payments (x402 v2)
 
-Payments are accepted on four chains. The original endpoints stay **Base / USDC**;
-each additional chain is a sub-route — existing `route.ts` files are unchanged.
+Payments use x402 protocol **v2** with CAIP-2 network identifiers. Base and
+Polygon are gated by `withX402` from `@x402/next`; Solana and BNB Chain use
+a hand-built v2 402 envelope (the `@x402/*` SDK doesn't cover them here).
 
-| Chain | Token(s) | Route | Gating |
-| --- | --- | --- | --- |
-| **Base** | USDC | `/api/macro/{endpoint}` | `paymentMiddleware` |
-| **Solana** | USDC | `/api/macro/{endpoint}/solana` | manual x402 402 |
-| **Polygon** | USDC · JPYC | `/api/macro/{endpoint}/polygon` | `withX402` (`network: "polygon"`) |
-| **BNB Chain** | USDT | `/api/macro/{endpoint}/bnb` | manual x402 402 |
+| Chain | Network (CAIP-2) | Token | Route | Gating |
+| --- | --- | --- | --- | --- |
+| **Base** | `eip155:8453` | USDC | `/api/macro/{endpoint}` | `withX402` (@x402/next v2) |
+| **Polygon** | `eip155:137` | USDC | `/api/macro/{endpoint}/polygon` | `withX402` (@x402/next v2) |
+| **Solana** | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | USDC | `/api/macro/{endpoint}/solana` | manual x402 v2 402 |
+| **BNB Chain** | `eip155:56` | USDT | `/api/macro/{endpoint}/bnb` | manual x402 v2 402 |
 
 - The chain selector on the landing page defaults to **Solana**.
 - **Solana** → USDC only (the JPYC tab is shown disabled / grayed out).
 - **BNB Chain** → USDT only.
-- On **Polygon**, request JPYC pricing by adding `?token=jpyc` to the sub-route.
-- BNB Chain uses a manual 402 (`network: "eip155:56"`): the x402 `Network` enum
-  has no `bnb`/`bsc` value, so `withX402` cannot be used for it.
+- BNB Chain uses a manual 402 (`network: "eip155:56"`): the x402 `Network`
+  enum is EVM-centric but has no entry for BNB, so `withX402` can't type-check it.
+- Settlement runs through the **CDP v2 facilitator** at
+  `FACILITATOR_URL` when `CDP_API_KEY_ID` + `CDP_API_KEY_SECRET` are set.
 
 Token contracts:
 
 | Token | Chain | Contract |
 | --- | --- | --- |
 | USDC | Solana | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
-| JPYC | Polygon | `0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB` |
+| USDC | Base | native (Circle) |
+| USDC | Polygon | native (Circle) |
 | USDT | BNB Chain | `0x55d398326f99059fF775485246999027B3197955` |
 
 Wallet connection uses RainbowKit / wagmi for the EVM chains and the Solana
@@ -108,7 +111,7 @@ wallet adapter (Phantom · Solflare) for Solana.
 
 ### Tech stack
 
-Next.js 15 · React 19 · `x402-next` · `@anthropic-ai/sdk` (Claude `claude-opus-4-7`) ·
+Next.js 15 · React 19 · `@x402/next` (v2) · `@anthropic-ai/sdk` (Claude `claude-opus-4-7`) ·
 viem · wagmi · RainbowKit · TanStack Query · Solana wallet adapter.
 
 ### Environment variables
@@ -121,12 +124,17 @@ ESTAT_API_KEY=
 JAPAN_DATA_API_URL=
 
 # Payment wallets
-WALLET_ADDRESS=                  # EVM receiving wallet (Base / Polygon / BNB)
-SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
+WALLET_ADDRESS=0xC67d94504696960bA0f2e7C3FeE703950734c00A   # EVM receiving wallet (Base / Polygon / BNB)
+SOLANA_WALLET_ADDRESS=                                       # Solana receiving wallet (base58)
 
-# x402 facilitator
-FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
-POLYGON_FACILITATOR_URL=         # Polygon-capable facilitator (falls back to FACILITATOR_URL)
+# x402 v2 facilitator (CDP)
+# When both CDP API keys are set, the app authenticates with the CDP
+# facilitator at FACILITATOR_URL (gas sponsorship, mainnet SLA). Leave
+# both empty to fall back to an unauthenticated FACILITATOR_URL, or omit
+# everything for the package default.
+CDP_API_KEY_ID=        # UUID (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+CDP_API_KEY_SECRET=    # base64 (often ends with ==)
+FACILITATOR_URL=https://api.cdp.coinbase.com/platform/v2/x402
 
 # RPC endpoints
 HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
@@ -135,10 +143,7 @@ BNB_RPC_URL=https://bsc-dataseed.binance.org/
 
 # Wallet / token contracts
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
-NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
 NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
-JPYC_EIP712_NAME=JPYC            # verify against the deployed JPYC contract
-JPYC_EIP712_VERSION=1            # verify against the deployed JPYC contract
 ```
 
 Without keys the dashboard runs on the fallback dataset. Copy `.env.example` to
@@ -212,31 +217,34 @@ APACの4つのマクロ要因（金利・為替・不動産・インフレ）を
 - パネル詳細: **$0.20**
 - 週次レポート: **$3.00**
 
-### マルチチェーン決済
+### マルチチェーン決済（x402 v2）
 
-決済は4つのチェーンに対応しています。既存エンドポイントは **Base / USDC** のまま、
-各チェーンはサブルートとして追加されます（既存の `route.ts` は変更しません）。
+決済は x402 プロトコルの **v2** を使用し、ネットワーク識別子は CAIP-2 形式です。
+Base / Polygon は `@x402/next` の `withX402` でゲート。Solana / BNB Chain は手動の
+v2 402 エンベロープ（`@x402/*` SDK が現状カバーしていないため）。
 
-| チェーン | トークン | ルート | ゲーティング |
-| --- | --- | --- | --- |
-| **Base** | USDC | `/api/macro/{endpoint}` | `paymentMiddleware` |
-| **Solana** | USDC | `/api/macro/{endpoint}/solana` | 手動 x402 402 |
-| **Polygon** | USDC・JPYC | `/api/macro/{endpoint}/polygon` | `withX402`（`network: "polygon"`） |
-| **BNB Chain** | USDT | `/api/macro/{endpoint}/bnb` | 手動 x402 402 |
+| チェーン | ネットワーク（CAIP-2） | トークン | ルート | ゲーティング |
+| --- | --- | --- | --- | --- |
+| **Base** | `eip155:8453` | USDC | `/api/macro/{endpoint}` | `withX402`（@x402/next v2） |
+| **Polygon** | `eip155:137` | USDC | `/api/macro/{endpoint}/polygon` | `withX402`（@x402/next v2） |
+| **Solana** | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | USDC | `/api/macro/{endpoint}/solana` | 手動 x402 v2 402 |
+| **BNB Chain** | `eip155:56` | USDT | `/api/macro/{endpoint}/bnb` | 手動 x402 v2 402 |
 
 - ランディングページのチェーンセレクターはデフォルトで **Solana**。
 - **Solana** → USDCのみ（JPYCタブは無効・グレーアウト表示）。
 - **BNB Chain** → USDTのみ。
-- **Polygon** で JPYC 決済を行う場合はサブルートに `?token=jpyc` を付与。
-- BNB Chain は手動402（`network: "eip155:56"`）を使用します。x402の `Network`
-  列挙型に `bnb`/`bsc` がないため `withX402` は利用できません。
+- BNB Chain は手動402（`network: "eip155:56"`）。x402の `Network` 列挙型に
+  `bnb`/`bsc` がないため `withX402` は利用できません。
+- `CDP_API_KEY_ID` + `CDP_API_KEY_SECRET` を設定すると **CDP v2 facilitator**
+  （`FACILITATOR_URL`）が決済を verify + settle します。
 
 トークンコントラクト:
 
 | トークン | チェーン | コントラクト |
 | --- | --- | --- |
 | USDC | Solana | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
-| JPYC | Polygon | `0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB` |
+| USDC | Base | native（Circle） |
+| USDC | Polygon | native（Circle） |
 | USDT | BNB Chain | `0x55d398326f99059fF775485246999027B3197955` |
 
 ウォレット接続は EVM チェーンで RainbowKit / wagmi、Solana で Solana ウォレット
@@ -244,7 +252,7 @@ APACの4つのマクロ要因（金利・為替・不動産・インフレ）を
 
 ### 技術スタック
 
-Next.js 15 · React 19 · `x402-next` · `@anthropic-ai/sdk`（Claude `claude-opus-4-7`）·
+Next.js 15 · React 19 · `@x402/next` (v2) · `@anthropic-ai/sdk`（Claude `claude-opus-4-7`）·
 viem · wagmi · RainbowKit · TanStack Query · Solana ウォレットアダプター。
 
 ### 環境変数
@@ -257,12 +265,17 @@ ESTAT_API_KEY=
 JAPAN_DATA_API_URL=
 
 # Payment wallets
-WALLET_ADDRESS=                  # EVM receiving wallet (Base / Polygon / BNB)
-SOLANA_WALLET_ADDRESS=           # Solana receiving wallet (base58)
+WALLET_ADDRESS=0xC67d94504696960bA0f2e7C3FeE703950734c00A   # EVM receiving wallet (Base / Polygon / BNB)
+SOLANA_WALLET_ADDRESS=                                       # Solana receiving wallet (base58)
 
-# x402 facilitator
-FACILITATOR_URL=https://api.developer.coinbase.com/rpc/v1/base/facilitator
-POLYGON_FACILITATOR_URL=         # Polygon-capable facilitator (falls back to FACILITATOR_URL)
+# x402 v2 facilitator (CDP)
+# When both CDP API keys are set, the app authenticates with the CDP
+# facilitator at FACILITATOR_URL (gas sponsorship, mainnet SLA). Leave
+# both empty to fall back to an unauthenticated FACILITATOR_URL, or omit
+# everything for the package default.
+CDP_API_KEY_ID=        # UUID (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+CDP_API_KEY_SECRET=    # base64 (often ends with ==)
+FACILITATOR_URL=https://api.cdp.coinbase.com/platform/v2/x402
 
 # RPC endpoints
 HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
@@ -271,10 +284,7 @@ BNB_RPC_URL=https://bsc-dataseed.binance.org/
 
 # Wallet / token contracts
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=placeholder
-NEXT_PUBLIC_JPYC_CONTRACT=0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
 NEXT_PUBLIC_USDT_BNB_CONTRACT=0x55d398326f99059fF775485246999027B3197955
-JPYC_EIP712_NAME=JPYC            # verify against the deployed JPYC contract
-JPYC_EIP712_VERSION=1            # verify against the deployed JPYC contract
 ```
 
 APIキーが未設定の場合はフォールバックデータで動作します。`.env.example` を

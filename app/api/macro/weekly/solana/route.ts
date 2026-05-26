@@ -6,12 +6,13 @@ import {
   withManual402,
   corsPreflight,
 } from "@/lib/payments";
+import { SOLANA_NETWORK } from "@/lib/x402";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/macro/weekly/solana — Solana USDC, manual x402 402 ($3.00).
+// GET /api/macro/weekly/solana — Solana USDC, manual x402 v2 402 ($3.00).
 export const GET = withManual402(weeklyHandler, {
-  network: "solana-mainnet",
+  network: SOLANA_NETWORK,
   asset: SOLANA_USDC,
   amount: PRICE_ATOMIC_6.weekly,
   description: ENDPOINT_DESCRIPTION.weekly,

@@ -1,35 +1,28 @@
-import { NextResponse } from "next/server";
-import { getSnapshot, isPanelKey, PANEL_KEYS } from "@/lib/macro";
+import { withX402 } from "@x402/next";
+import { panelHandler } from "@/lib/macroHandlers";
+import { x402Server, PAY_TO, BASE_NETWORK } from "@/lib/x402";
+import { PRICE_USD, ENDPOINT_DESCRIPTION, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
-/**
- * POST /api/macro/panel — x402-gated ($0.20).
- * Body: { panel: "rates" | "fx" | "realestate" | "inflation" }
- * Returns the detailed data for a single macro panel.
- */
-export async function POST(req: Request) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    body = null;
-  }
-
-  const panel = (body as { panel?: unknown } | null)?.panel;
-  if (!isPanelKey(panel)) {
-    return NextResponse.json(
+// POST /api/macro/panel — Base USDC ($0.20), x402 v2 withX402.
+export const POST = withX402(
+  panelHandler,
+  {
+    accepts: [
       {
-        error: `Invalid "panel". Must be one of: ${PANEL_KEYS.join(", ")}`,
+        scheme: "exact",
+        payTo: PAY_TO,
+        price: PRICE_USD.panel,
+        network: BASE_NETWORK,
       },
-      { status: 400 },
-    );
-  }
+    ],
+    description: ENDPOINT_DESCRIPTION.panel,
+    mimeType: "application/json",
+  },
+  x402Server,
+);
 
-  const snapshot = await getSnapshot();
-  return NextResponse.json({
-    updatedAt: snapshot.updatedAt,
-    dataMode: snapshot.dataMode,
-    panel: snapshot.panelDetails[panel],
-  });
+export function OPTIONS() {
+  return corsPreflight();
 }

@@ -1,18 +1,26 @@
-import { withX402 } from "x402-next";
+import { withX402 } from "@x402/next";
 import { panelHandler } from "@/lib/macroHandlers";
-import { polygonRouteConfig, polygonFacilitatorUrl, corsPreflight } from "@/lib/payments";
+import { x402Server, PAY_TO, POLYGON_NETWORK } from "@/lib/x402";
+import { PRICE_USD, ENDPOINT_DESCRIPTION, corsPreflight } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
-const payTo = (process.env.WALLET_ADDRESS ??
-  "0x0000000000000000000000000000000000000000") as `0x${string}`;
-
-// POST /api/macro/panel/polygon — Polygon USDC (default) or JPYC (?token=jpyc).
+// POST /api/macro/panel/polygon — Polygon USDC ($0.20), x402 v2 withX402.
 export const POST = withX402(
   panelHandler,
-  payTo,
-  polygonRouteConfig("panel"),
-  { url: polygonFacilitatorUrl },
+  {
+    accepts: [
+      {
+        scheme: "exact",
+        payTo: PAY_TO,
+        price: PRICE_USD.panel,
+        network: POLYGON_NETWORK,
+      },
+    ],
+    description: ENDPOINT_DESCRIPTION.panel,
+    mimeType: "application/json",
+  },
+  x402Server,
 );
 
 export function OPTIONS() {
